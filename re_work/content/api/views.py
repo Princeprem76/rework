@@ -41,7 +41,7 @@ class GetProductVideoContent(APIView):
             serializer = VideoContentSerializer(products, many=True)
             return Response({'contents': serializer.data}, status=status.HTTP_200_OK)
         except:
-            return Response({'contents': 'No video present'}, status=status.HTTP_204_NO_CONTENT)
+            return Response({'contents': 'No video present'}, status=status.HTTP_200_OK)
 
 
 class GetPreContent(APIView):
@@ -69,7 +69,7 @@ class GetProdContent(APIView):
             serializer = ProductionContentSerializer(products, many=True)
             return Response({'contents': serializer.data}, status=status.HTTP_200_OK)
         except:
-            return Response({'contents': 'No video present'}, status=status.HTTP_204_NO_CONTENT)
+            return Response({'contents': 'No video present'}, status=status.HTTP_200_OK)
 
 
 class GetPostContent(APIView):
@@ -83,7 +83,7 @@ class GetPostContent(APIView):
             serializer = PostContentSerializer(products, many=True)
             return Response({'contents': serializer.data}, status=status.HTTP_200_OK)
         except:
-            return Response({'contents': 'No video present'}, status=status.HTTP_204_NO_CONTENT)
+            return Response({'contents': 'No video present'}, status=status.HTTP_200_OK)
 
 
 class AddPreContentsFile(APIView):
