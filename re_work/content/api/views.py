@@ -9,7 +9,8 @@ from ..models import Section, VideoContent, PreProductionContent, PostProduction
     CommonContent, Comments
 from push_notifications.models import APNSDevice, GCMDevice
 
-device = GCMDevice.objects.get(registration_id=gcm_reg_id)
+
+# device = GCMDevice.objects.get(registration_id=gcm_reg_id)
 
 
 class InsertVideoContent(APIView):
