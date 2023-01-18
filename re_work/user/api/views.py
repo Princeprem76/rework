@@ -78,9 +78,11 @@ class Developer_List(APIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
 
     def get(self, *args, **kwargs):
-        queryset = User.objects.filter(Q(user_type=3) | Q(user_type=4))
-        serializer = self.serializer_class(queryset, many=True)
-        return Response({"details": serializer.data}, status=status.HTTP_200_OK)
+        scripter = User.objects.filter(Q(user_type=3) | Q(user_type=5))
+        video_editor = User.objects.filter(Q(user_type=4) | Q(user_type=5))
+        serializer_script = self.serializer_class(scripter, many=True)
+        serializer_video = self.serializer_class(video_editor, many=True)
+        return Response({"script": serializer_script.data, "video": serializer_video.data}, status=status.HTTP_200_OK)
 
 
 class Login_User(APIView):
@@ -93,20 +95,86 @@ class Login_User(APIView):
             user = authenticate(username=email, password=password)
             if user is not None:
                 user_details = User.objects.get(email=email)
-                # if user_details.is_client:
-                refresh = RefreshToken.for_user(user)
-                login(request, user)
-                ser = UserData(user_details, many=False)
-                response = {
-                    "user_profile": ser.data,
-                    "refresh": str(refresh),
-                    "access": str(refresh.access_token),
-                }
-                return Response(response, status=status.HTTP_200_OK)
-            # else:
-            #     return Response({
-            #         "message": "The user is not a client!",
-            #     }, status=status.HTTP_400_BAD_REQUEST)
+                if user_details.is_client:
+                    refresh = RefreshToken.for_user(user)
+                    login(request, user)
+                    ser = UserData(user_details, many=False)
+                    response = {
+                        "user_profile": ser.data,
+                        "refresh": str(refresh),
+                        "access": str(refresh.access_token),
+                    }
+                    return Response(response, status=status.HTTP_200_OK)
+                else:
+                    return Response({
+                        "message": "The user is not a client!",
+                    }, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response({
+                    "message": "Email or password doesn't match!",
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+        except User.DoesNotExist:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class Login_Admin(APIView):
+    permission_classes = []
+
+    def post(self, request, *args, **kwargs):
+        email = request.data['email']
+        password = request.data['password']
+        try:
+            user = authenticate(username=email, password=password)
+            if user is not None:
+                user_details = User.objects.get(email=email)
+                if user_details.is_admin:
+                    refresh = RefreshToken.for_user(user)
+                    login(request, user)
+                    ser = UserData(user_details, many=False)
+                    response = {
+                        "user_profile": ser.data,
+                        "refresh": str(refresh),
+                        "access": str(refresh.access_token),
+                    }
+                    return Response(response, status=status.HTTP_200_OK)
+                else:
+                    return Response({
+                        "message": "The user is not a Admin!",
+                    }, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response({
+                    "message": "Email or password doesn't match!",
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+        except User.DoesNotExist:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class Login_Developer(APIView):
+    permission_classes = []
+
+    def post(self, request, *args, **kwargs):
+        email = request.data['email']
+        password = request.data['password']
+        try:
+            user = authenticate(username=email, password=password)
+            if user is not None:
+                user_details = User.objects.get(email=email)
+                if user_details.is_full_stack or user_details.is_script_writer or user_details.is_video_editor:
+                    refresh = RefreshToken.for_user(user)
+                    login(request, user)
+                    ser = UserData(user_details, many=False)
+                    response = {
+                        "user_profile": ser.data,
+                        "refresh": str(refresh),
+                        "access": str(refresh.access_token),
+                    }
+                    return Response(response, status=status.HTTP_200_OK)
+                else:
+                    return Response({
+                        "message": "The user is not a developer!",
+                    }, status=status.HTTP_400_BAD_REQUEST)
             else:
                 return Response({
                     "message": "Email or password doesn't match!",

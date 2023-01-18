@@ -14,7 +14,7 @@ class Comments(TimeStampAbstractModel):
 
 class CommonContent(TimeStampAbstractModel):
     name = models.CharField(max_length=255, null=True, blank=True)
-    comment = models.ForeignKey(Comments, related_name="Comments", on_delete=models.CASCADE, null=True, blank=True)
+    comment = models.ManyToManyField(Comments, related_name="Content_Comment")
 
 
 class VideoContent(CommonContent, models.Model):

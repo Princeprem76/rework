@@ -7,6 +7,9 @@ from .serializer import VideoContentSerializer, PreContentSerializer, Production
     PostContentSerializer, CommentSerializer
 from ..models import Section, VideoContent, PreProductionContent, PostProductionContent, ProductionContent, FileContent, \
     CommonContent, Comments
+from push_notifications.models import APNSDevice, GCMDevice
+
+device = GCMDevice.objects.get(registration_id=gcm_reg_id)
 
 
 class InsertVideoContent(APIView):
@@ -257,3 +260,96 @@ class get_comment(APIView):
         commentss = Comments.objects.filter(id=com)
         serializer = CommentSerializer(commentss, many=True)
         return Response({'details': serializer.data})
+
+
+class CreateVideoComment(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        content_id = self.kwargs['pk']
+        comment = request.data['comment']
+        com, _ = Comments.objects.get_or_create(comment=comment, user=self.request.user)
+        video = VideoContent.objects.get(id=content_id)
+        video.comment.add(com)
+        video.save()
+        return Response({"details": "Comment Added!"})
+
+
+class CreateVideoCommentReply(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        content_id = self.kwargs['pk']
+        comment = request.data['comment']
+        com, _ = Comments.objects.get_or_create(comment=comment, user=self.request.user)
+        video = VideoContent.objects.get(id=content_id)
+        if video.comment is None:
+            video.comment = com
+            video.save()
+            return Response({"details": "Comment Added!"})
+        parent_id = video.comment
+        com.parents = parent_id
+        com.save()
+        return Response({"details": "Comment Added!"})
+
+
+class CreateFileComment(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        content_id = self.kwargs['pk']
+        comment = request.data['comment']
+        com, _ = Comments.objects.get_or_create(comment=comment, user=self.request.user)
+        file = FileContent.objects.get(id=content_id)
+        file.comment.add(com)
+        file.save()
+        return Response({"details": "Comment Added!"})
+
+
+class CreateFileCommentReply(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        content_id = self.kwargs['pk']
+        comment = request.data['comment']
+        com, _ = Comments.objects.get_or_create(comment=comment, user=self.request.user)
+        file = FileContent.objects.get(id=content_id)
+        if file.comment is None:
+            file.comment = com
+            file.save()
+            return Response({"details": "Comment Added!"})
+        parent_id = file.comment
+        com.parents = parent_id
+        com.save()
+        return Response({"details": "Comment Added!"})
+
+
+class CreateCommonCommentReply(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        content_id = self.kwargs['pk']
+        comment = request.data['comment']
+        com, _ = Comments.objects.get_or_create(comment=comment, user=self.request.user)
+        common = CommonContent.objects.get(id=content_id)
+        if common.comment is None:
+            common.comment = com
+            common.save()
+            return Response({"details": "Comment Added!"})
+        parent_id = common.comment
+        com.parents = parent_id
+        com.save()
+        return Response({"details": "Comment Added!"})
+
+
+class CreateCommonComment(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        content_id = self.kwargs['pk']
+        comment = request.data['comment']
+        com, _ = Comments.objects.get_or_create(comment=comment, user=self.request.user)
+        common = CommonContent.objects.get(id=content_id)
+        common.comment.add(com)
+        common.save()
+        return Response({"details": "Comment Added!"})

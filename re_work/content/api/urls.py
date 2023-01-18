@@ -1,7 +1,8 @@
 from rest_framework.urls import path
 from .views import (InsertVideoContent, GetProductVideoContent, GetPostContent, GetProdContent, GetPreContent, \
                     AddProdContent, AddPreContentsFile, AddLocationContents, AddPropsContents, AddModelContents, \
-                    AddPostProdContentDelivery, AddPostProdContentEditing, AddPostProdContentInternal, get_comment, )
+                    AddPostProdContentDelivery, AddPostProdContentEditing, AddPostProdContentInternal, get_comment,
+                    CreateFileComment, CreateVideoComment, CreateCommonComment)
 
 app_name = 'contents'
 
@@ -19,4 +20,7 @@ urlpatterns = [
     path('addpost-internal/<int:pk>/', AddPostProdContentInternal.as_view(), name="Add_Post_Internal"),
     path('addpost-delivery/<int:pk>/', AddPostProdContentDelivery.as_view(), name="Add_Post_Delivery"),
     path('comments/<int:pk>/', get_comment.as_view(), name="Comments"),
+    path('file-comment/<int:pk>/', CreateFileComment.as_view(), name="File_Comment"),
+    path('video-comment/<int:pk>/', CreateVideoComment.as_view(), name="Video_Comment"),
+    path('common-comment/<int:pk>/', CreateCommonComment.as_view(), name="Common_Comment"),
 ]

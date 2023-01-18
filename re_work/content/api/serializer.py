@@ -6,18 +6,18 @@ from re_work.content.models import VideoContent, CommonContent, PreProductionCon
 
 class CommentSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source="user.name", read_only=True)
-    children_comment = serializers.SerializerMethodField("get_children_comment")
+    # children_comment = serializers.SerializerMethodField("get_children_comment")
 
     class Meta:
         model = Comments
-        fields = ['id', 'name', 'comment', 'children_comment']
+        fields = ['name', 'comment']
 
-    def get_children_comment(self, obj):
-        child_comment = Comments.objects.filter(parents_id=obj.id)
-        children_comments_detail = CommentSerializer(
-            child_comment, many=True, read_only=True
-        )
-        return children_comments_detail.data
+    # def get_children_comment(self, obj):
+    #     child_comment = Comments.objects.filter(parents_id=obj.id).order_by("created_at")
+    #     children_comments_detail = CommentSerializer(
+    #         child_comment, many=True, read_only=True
+    #     )
+    #     return children_comments_detail.data
 
 
 class VideoContentSerializer(serializers.ModelSerializer):
@@ -25,15 +25,15 @@ class VideoContentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = VideoContent
-        fields = ['video_url', 'duration', 'name', 'comment']
+        fields = ['id', 'video_url', 'duration', 'name', 'comment']
 
 
 class FileContentSerializer(serializers.ModelSerializer):
-    comment = CommentSerializer(many=False)
+    comment = CommentSerializer(many=True)
 
     class Meta:
         model = FileContent
-        fields = ['files', 'name', 'comment']
+        fields = ['id', 'files', 'name', 'comment']
 
 
 class CommonContentSerializer(serializers.ModelSerializer):
@@ -45,7 +45,7 @@ class CommonContentSerializer(serializers.ModelSerializer):
 
 
 class PreContentSerializer(serializers.ModelSerializer):
-    comments = CommentSerializer(many=False, read_only=True)
+    comments = CommentSerializer(many=True, read_only=True)
     file_contents = FileContentSerializer(many=True, read_only=True)
     location = CommonContentSerializer(many=True)
     props = CommonContentSerializer(many=True)

@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     "drf_spectacular",
     'corsheaders',
+    'push_notifications',
     're_work.user.apps.UserConfig',
     're_work.core.apps.CoreConfig',
     're_work.content.apps.ContentConfig',
@@ -161,6 +162,10 @@ MEDIA_URL = '/media/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+PUSH_NOTIFICATIONS_SETTINGS = {
+    "FCM_API_KEY": "[your api key]",
+}
 
 env = environ.Env()
 environ.Env.read_env()
