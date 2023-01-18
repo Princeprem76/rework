@@ -9,6 +9,12 @@ class UserData(serializers.ModelSerializer):
         fields = ['name', 'get_image', 'phone', 'address']
 
 
+class DeveloperData(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['name', 'get_image', 'phone', 'address', 'user_type']
+
+
 class UserSelection(serializers.ModelSerializer):
     class Meta:
         model = User

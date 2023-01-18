@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from re_work.user.api.serializer import UserData, UserCreation, UserSelection
+from re_work.user.api.serializer import UserData, UserCreation, UserSelection, DeveloperData
 from re_work.user.models import User
 
 sensitive_post_parameters_m = method_decorator(
@@ -164,7 +164,7 @@ class Login_Developer(APIView):
                 if user_details.is_full_stack or user_details.is_script_writer or user_details.is_video_editor:
                     refresh = RefreshToken.for_user(user)
                     login(request, user)
-                    ser = UserData(user_details, many=False)
+                    ser = DeveloperData(user_details, many=False)
                     response = {
                         "user_profile": ser.data,
                         "refresh": str(refresh),
