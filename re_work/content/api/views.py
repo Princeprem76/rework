@@ -4,13 +4,14 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .serializer import VideoContentSerializer, PreContentSerializer, ProductionContentSerializer, \
-    PostContentSerializer, CommentSerializer
+    PostContentSerializer, CommentSerializer, FileContentSerializer, FileContentSerializerAdmin, \
+    VideoContentSerializerAdmin
 from ..models import Section, VideoContent, PreProductionContent, PostProductionContent, ProductionContent, FileContent, \
     CommonContent, Comments
 from push_notifications.models import APNSDevice, GCMDevice
 
-
 # device = GCMDevice.objects.get(registration_id=gcm_reg_id)
+from ...product.models import Product
 
 
 class InsertVideoContent(APIView):
@@ -22,9 +23,12 @@ class InsertVideoContent(APIView):
             admin = self.request.user.is_admin
             admin_staff = self.request.user.is_staff_admin
             full_stack = self.request.user.is_full_stack
-            if not (admin or video_edit or admin_staff or full_stack):
-                return Response({'details': 'User not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
             products_id = self.kwargs['pk']
+            section = Section.objects.get(product_id=products_id)
+            if not (
+                    admin or video_edit or admin_staff or full_stack or section.product.video_editor == self.request.user):
+                return Response({'details': 'User not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
+
             section = Section.objects.get(product_id=products_id)
             video, _ = VideoContent.objects.get_or_create(video_url=self.request.data['video_url'],
                                                           duration=self.request.data['duration'])
@@ -41,8 +45,22 @@ class GetProductVideoContent(APIView):
         try:
             products_id = self.kwargs['pk']
             section = Section.objects.get(product_id=products_id)
-            products = section.video_content.all()
+            products = section.video_content.all().filter(has_approved=True)
             serializer = VideoContentSerializer(products, many=True)
+            return Response({'contents': serializer.data}, status=status.HTTP_200_OK)
+        except:
+            return Response({'contents': 'No video present'}, status=status.HTTP_200_OK)
+
+
+class GetAdminProductVideoContent(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        try:
+            products_id = self.kwargs['pk']
+            section = Section.objects.get(product_id=products_id)
+            products = section.video_content.all()
+            serializer = VideoContentSerializerAdmin(products, many=True)
             return Response({'contents': serializer.data}, status=status.HTTP_200_OK)
         except:
             return Response({'contents': 'No video present'}, status=status.HTTP_200_OK)
@@ -56,10 +74,61 @@ class GetPreContent(APIView):
             products_id = self.kwargs['pk']
             section = Section.objects.get(product_id=products_id)
             products = section.pre_contents.all()
+            file = section.pre_contents.all().first()
+            f = file.file_contents.all().filter(has_approved=True)
+            file_ser = FileContentSerializer(f, many=True)
             serializer = PreContentSerializer(products, many=True)
-            return Response({'contents': serializer.data}, status=status.HTTP_200_OK)
+            return Response({'contents': serializer.data, 'file': file_ser.data}, status=status.HTTP_200_OK)
         except:
-            return Response({'contents': 'No video present'}, status=status.HTTP_200_OK)
+            return Response({'contents': 'No content present'}, status=status.HTTP_200_OK)
+
+
+class GetAdminPreContent(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        try:
+            products_id = self.kwargs['pk']
+            prod = Product.objects.get(id=products_id)
+            if not (self.request.user.is_admin or self.request.user.is_staff_admin):
+                return Response({'details': 'User not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
+            section = Section.objects.get(product_id=products_id)
+            products = section.pre_contents.all()
+            file = section.pre_contents.all().first()
+            f = file.file_contents.all()
+            file_ser = FileContentSerializerAdmin(f, many=True)
+            serializer = PreContentSerializer(products, many=True)
+            return Response({'contents': serializer.data, 'file': file_ser.data}, status=status.HTTP_200_OK)
+        except:
+            return Response({'contents': 'No content present'}, status=status.HTTP_200_OK)
+
+
+class GetDeveloperFileContent(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        products_id = self.kwargs['pk']
+        prod = Product.objects.get(id=products_id)
+        if prod.script_writer != self.request.user:
+            return Response({'details': 'User not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
+        section = Section.objects.get(product_id=products_id)
+        file = section.pre_contents.all().first().file_contents.all()
+        file_ser = FileContentSerializerAdmin(file, many=True)
+        return Response({'details': file_ser.data}, status=status.HTTP_200_OK)
+
+
+class GetDeveloperVideoContent(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        products_id = self.kwargs['pk']
+        prod = Product.objects.get(id=products_id)
+        if prod.video_editor != self.request.user:
+            return Response({'details': 'User not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
+        section = Section.objects.get(product_id=products_id)
+        video = section.video_content.all()
+        vid_ser = VideoContentSerializerAdmin(video, many=True)
+        return Response({'details': vid_ser.data}, status=status.HTTP_200_OK)
 
 
 class GetProdContent(APIView):
@@ -73,7 +142,7 @@ class GetProdContent(APIView):
             serializer = ProductionContentSerializer(products, many=True)
             return Response({'contents': serializer.data}, status=status.HTTP_200_OK)
         except:
-            return Response({'contents': 'No video present'}, status=status.HTTP_200_OK)
+            return Response({'contents': 'No content present'}, status=status.HTTP_200_OK)
 
 
 class GetPostContent(APIView):
@@ -87,7 +156,7 @@ class GetPostContent(APIView):
             serializer = PostContentSerializer(products, many=True)
             return Response({'contents': serializer.data}, status=status.HTTP_200_OK)
         except:
-            return Response({'contents': 'No video present'}, status=status.HTTP_200_OK)
+            return Response({'contents': 'No content present'}, status=status.HTTP_200_OK)
 
 
 class AddPreContentsFile(APIView):
@@ -99,10 +168,10 @@ class AddPreContentsFile(APIView):
             admin = self.request.user.is_admin
             admin_staff = self.request.user.is_staff_admin
             full_stack = self.request.user.is_full_stack
-            if not (admin or script or admin_staff or full_stack):
-                return Response({'details': 'User not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
             products_id = self.kwargs['pk']
             section = Section.objects.get(product_id=products_id)
+            if not (admin or script or admin_staff or full_stack or section.product.script_writer == self.request.user):
+                return Response({'details': 'User not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
             file, _ = FileContent.objects.get_or_create(files=self.request.data['files'])
             pre = section.pre_contents.all().first()
             pre_file = pre.file_contents.add(file)
@@ -354,3 +423,36 @@ class CreateCommonComment(APIView):
         common.comment.add(com)
         common.save()
         return Response({"details": "Comment Added!"})
+
+
+class ApproveFileContent(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        file_id = self.kwargs['pk']
+        admin = self.request.user.is_admin
+        admin_staff = self.request.user.is_staff_admin
+        if not (admin or admin_staff):
+            return Response({'details': 'User not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
+        file = FileContent.objects.get(id=file_id)
+        file.has_approved = True
+        file.save()
+        return Response({'details': 'File has been Approved'}, status=status.HTTP_202_ACCEPTED)
+
+
+class ApproveVideoContent(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        video_id = self.kwargs['pk']
+        admin = self.request.user.is_admin
+        admin_staff = self.request.user.is_staff_admin
+        if not (admin or admin_staff):
+            return Response({'details': 'User not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
+        video = VideoContent.objects.get(id=video_id)
+        video.has_approved = True
+        video.save()
+        return Response({'details': 'Video has been Approved'}, status=status.HTTP_202_ACCEPTED)
+
+
+'''Total 6 Api'''

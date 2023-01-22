@@ -6,6 +6,7 @@ from re_work.content.models import VideoContent, CommonContent, PreProductionCon
 
 class CommentSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source="user.name", read_only=True)
+
     # children_comment = serializers.SerializerMethodField("get_children_comment")
 
     class Meta:
@@ -28,12 +29,28 @@ class VideoContentSerializer(serializers.ModelSerializer):
         fields = ['id', 'video_url', 'duration', 'name', 'comment']
 
 
+class VideoContentSerializerAdmin(serializers.ModelSerializer):
+    comment = CommentSerializer(many=True)
+
+    class Meta:
+        model = VideoContent
+        fields = ['id', 'video_url', 'duration', 'name', 'comment', 'has_approved']
+
+
 class FileContentSerializer(serializers.ModelSerializer):
     comment = CommentSerializer(many=True)
 
     class Meta:
         model = FileContent
         fields = ['id', 'files', 'name', 'comment']
+
+
+class FileContentSerializerAdmin(serializers.ModelSerializer):
+    comment = CommentSerializer(many=True)
+
+    class Meta:
+        model = FileContent
+        fields = ['id', 'files', 'name', 'comment', 'has_approved']
 
 
 class CommonContentSerializer(serializers.ModelSerializer):
@@ -45,17 +62,15 @@ class CommonContentSerializer(serializers.ModelSerializer):
 
 
 class PreContentSerializer(serializers.ModelSerializer):
-    comments = CommentSerializer(many=True, read_only=True)
-    file_contents = FileContentSerializer(many=True, read_only=True)
     location = CommonContentSerializer(many=True)
     props = CommonContentSerializer(many=True)
     model = CommonContentSerializer(many=True)
 
     class Meta:
         model = PreProductionContent
-        fields = ['id', 'file_contents', 'location', 'props', 'model', 'has_video', 'has_location', 'has_props',
+        fields = ['id', 'location', 'props', 'model', 'has_video', 'has_location', 'has_props',
                   'has_file', 'has_model', 'complete_video', 'complete_location', 'complete_props', 'complete_file',
-                  'complete_model', 'comments']
+                  'complete_model', ]
 
 
 class ProductionContentSerializer(serializers.ModelSerializer):
