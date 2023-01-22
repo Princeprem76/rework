@@ -22,49 +22,39 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class VideoContentSerializer(serializers.ModelSerializer):
-    comment = CommentSerializer(many=True)
-
     class Meta:
         model = VideoContent
-        fields = ['id', 'video_url', 'duration', 'name', 'comment']
+        fields = ['id', 'video_url', 'duration', 'name']
 
 
 class VideoContentSerializerAdmin(serializers.ModelSerializer):
-    comment = CommentSerializer(many=True)
-
     class Meta:
         model = VideoContent
-        fields = ['id', 'video_url', 'duration', 'name', 'comment', 'has_approved']
+        fields = ['id', 'video_url', 'duration', 'name', 'has_approved']
 
 
 class FileContentSerializer(serializers.ModelSerializer):
-    comment = CommentSerializer(many=True)
-
     class Meta:
         model = FileContent
-        fields = ['id', 'files', 'name', 'comment']
+        fields = ['id', 'files', 'name']
 
 
 class FileContentSerializerAdmin(serializers.ModelSerializer):
-    comment = CommentSerializer(many=True)
-
     class Meta:
         model = FileContent
-        fields = ['id', 'files', 'name', 'comment', 'has_approved']
+        fields = ['id', 'files', 'name', 'has_approved']
 
 
 class CommonContentSerializer(serializers.ModelSerializer):
-    comment = CommentSerializer(many=True, read_only=True)
-
     class Meta:
         model = CommonContent
-        fields = ['id', 'name', 'comment']
+        fields = ['id', 'name']
 
 
 class PreContentSerializer(serializers.ModelSerializer):
-    location = CommonContentSerializer(many=True)
-    props = CommonContentSerializer(many=True)
-    model = CommonContentSerializer(many=True)
+    location = CommonContentSerializer(many=True, read_only=True, allow_null=True)
+    props = CommonContentSerializer(many=True, read_only=True, allow_null=True)
+    model = CommonContentSerializer(many=True, read_only=True, allow_null=True)
 
     class Meta:
         model = PreProductionContent
@@ -80,8 +70,8 @@ class ProductionContentSerializer(serializers.ModelSerializer):
 
 
 class PostContentSerializer(serializers.ModelSerializer):
-    editing = CommonContentSerializer(many=True)
-    internal = CommonContentSerializer(many=True)
+    editing = CommonContentSerializer(many=True, read_only=True, allow_null=True)
+    internal = CommonContentSerializer(many=True, read_only=True, allow_null=True)
 
     class Meta:
         model = PostProductionContent

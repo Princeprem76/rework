@@ -45,7 +45,7 @@ class GetProductVideoContent(APIView):
         try:
             products_id = self.kwargs['pk']
             section = Section.objects.get(product_id=products_id)
-            products = section.video_content.all().filter(has_approved=True)
+            products = section.video_content.all().filter(has_approved=True).order_by('-created_at')
             serializer = VideoContentSerializer(products, many=True)
             return Response({'contents': serializer.data}, status=status.HTTP_200_OK)
         except:
@@ -64,23 +64,6 @@ class GetAdminProductVideoContent(APIView):
             return Response({'contents': serializer.data}, status=status.HTTP_200_OK)
         except:
             return Response({'contents': 'No video present'}, status=status.HTTP_200_OK)
-
-
-class GetPreContent(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, *args, **kwargs):
-        try:
-            products_id = self.kwargs['pk']
-            section = Section.objects.get(product_id=products_id)
-            products = section.pre_contents.all()
-            file = section.pre_contents.all().first()
-            f = file.file_contents.all().filter(has_approved=True)
-            file_ser = FileContentSerializer(f, many=True)
-            serializer = PreContentSerializer(products, many=True)
-            return Response({'contents': serializer.data, 'file': file_ser.data}, status=status.HTTP_200_OK)
-        except:
-            return Response({'contents': 'No content present'}, status=status.HTTP_200_OK)
 
 
 class GetAdminPreContent(APIView):
@@ -131,30 +114,25 @@ class GetDeveloperVideoContent(APIView):
         return Response({'details': vid_ser.data}, status=status.HTTP_200_OK)
 
 
-class GetProdContent(APIView):
+class GetProductContent(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
         try:
             products_id = self.kwargs['pk']
             section = Section.objects.get(product_id=products_id)
-            products = section.production_contents.all()
-            serializer = ProductionContentSerializer(products, many=True)
-            return Response({'contents': serializer.data}, status=status.HTTP_200_OK)
-        except:
-            return Response({'contents': 'No content present'}, status=status.HTTP_200_OK)
-
-
-class GetPostContent(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, *args, **kwargs):
-        try:
-            products_id = self.kwargs['pk']
-            section = Section.objects.get(product_id=products_id)
-            products = section.production_contents.all()
-            serializer = PostContentSerializer(products, many=True)
-            return Response({'contents': serializer.data}, status=status.HTTP_200_OK)
+            prodproducts = section.production_contents.all()
+            prodserializer = ProductionContentSerializer(prodproducts, many=True)
+            postproducts = section.post_contents.all()
+            postserializer = PostContentSerializer(postproducts, many=True)
+            preproducts = section.pre_contents.all()
+            file = section.pre_contents.all().first()
+            f = file.file_contents.all().filter(has_approved=True)
+            file_ser = FileContentSerializer(f, many=True)
+            preserializer = PreContentSerializer(preproducts, many=True)
+            return Response(
+                {'precontents': preserializer.data, 'files': file_ser.data, 'prodcontents': prodserializer.data,
+                 'postcontents': postserializer.data}, status=status.HTTP_200_OK)
         except:
             return Response({'contents': 'No content present'}, status=status.HTTP_200_OK)
 
@@ -322,13 +300,36 @@ class AddPostProdContentDelivery(APIView):
             return Response({'details': 'Error!'})
 
 
-class get_comment(APIView):
-    permission_classes = []
+class getFileComment(APIView):
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
         com = self.kwargs['pk']
-        commentss = Comments.objects.filter(id=com)
-        serializer = CommentSerializer(commentss, many=True)
+        commentss = FileContent.objects.get(id=com)
+        c = commentss.comment.all()
+        serializer = CommentSerializer(c, many=True)
+        return Response({'details': serializer.data})
+
+
+class getVideoComment(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        com = self.kwargs['pk']
+        commentss = VideoContent.objects.get(id=com)
+        c = commentss.comment.all()
+        serializer = CommentSerializer(c, many=True)
+        return Response({'details': serializer.data})
+
+
+class getCommonComment(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        com = self.kwargs['pk']
+        commentss = CommonContent.objects.get(id=com)
+        c = commentss.comment.all()
+        serializer = CommentSerializer(c, many=True)
         return Response({'details': serializer.data})
 
 
