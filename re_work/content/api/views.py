@@ -66,7 +66,7 @@ class GetAdminProductVideoContent(APIView):
             return Response({'contents': 'No video present'}, status=status.HTTP_200_OK)
 
 
-class GetAdminPreContent(APIView):
+class GetAdminProductContent(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
@@ -76,12 +76,18 @@ class GetAdminPreContent(APIView):
             if not (self.request.user.is_admin or self.request.user.is_staff_admin):
                 return Response({'details': 'User not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
             section = Section.objects.get(product_id=products_id)
+            prodproducts = section.production_contents.all()
+            prodserializer = ProductionContentSerializer(prodproducts, many=True)
+            postproducts = section.post_contents.all()
+            postserializer = PostContentSerializer(postproducts, many=True)
             products = section.pre_contents.all()
             file = section.pre_contents.all().first()
             f = file.file_contents.all()
             file_ser = FileContentSerializerAdmin(f, many=True)
             serializer = PreContentSerializer(products, many=True)
-            return Response({'contents': serializer.data, 'file': file_ser.data}, status=status.HTTP_200_OK)
+            return Response(
+                {'precontents': serializer.data, 'files': file_ser.data, 'prodcontents': prodserializer.data,
+                 'postcontents': postserializer.data}, status=status.HTTP_200_OK)
         except:
             return Response({'contents': 'No content present'}, status=status.HTTP_200_OK)
 
@@ -134,7 +140,7 @@ class GetProductContent(APIView):
                 {'precontents': preserializer.data, 'files': file_ser.data, 'prodcontents': prodserializer.data,
                  'postcontents': postserializer.data}, status=status.HTTP_200_OK)
         except:
-            return Response({'contents': 'No content present'}, status=status.HTTP_200_OK)
+            return Response({'contents': 'No content present'}, status=status.HTTP_204_NO_CONTENT)
 
 
 class AddPreContentsFile(APIView):
