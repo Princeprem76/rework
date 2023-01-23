@@ -8,5 +8,5 @@ urlpatterns = [
     path('update-product/<int:pk>/', UpdateProduct.as_view(), name="product_update"),
     path('client-product/', ClientProductView.as_view(), name="client_products"),
     path('developer-product/', DeveloperProductView.as_view(), name="developer_product"),
-    path('product-list/', ProductList.as_view(), name="product_list"),
+    path('product-list/<int:pk>/', ProductList.as_view(), name="product_list"),
 ]

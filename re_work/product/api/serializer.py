@@ -12,13 +12,12 @@ class ProductDataSerializer(serializers.ModelSerializer):
 
 
 class ProductAdminDataSerializer(serializers.ModelSerializer):
-    client = serializers.CharField(source="client.name", read_only=True)
     video_editor = serializers.CharField(source="video_editor.name", read_only=True, allow_null=True)
     script_writer = serializers.CharField(source="script_writer.name", read_only=True, allow_null=True)
 
     class Meta:
         model = Product
-        fields = ['id', 'product_name', 'description', 'logo', 'client', 'video_editor', 'script_writer']
+        fields = ['id', 'product_name', 'description', 'logo', 'video_editor', 'script_writer']
 
 
 class ProductCreateSerializer(serializers.ModelSerializer):

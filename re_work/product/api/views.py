@@ -29,7 +29,7 @@ class ProductList(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        product = Product.objects.all()
+        product = Product.objects.filter(client_id=self.kwargs["pk"])
         serializer = self.serializer_class(product, many=True)
         return Response({"product_details": serializer.data}, status=status.HTTP_200_OK)
 
