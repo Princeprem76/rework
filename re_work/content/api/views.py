@@ -98,7 +98,8 @@ class GetDeveloperFileContent(APIView):
     def get(self, request, *args, **kwargs):
         products_id = self.kwargs['pk']
         prod = Product.objects.get(id=products_id)
-        if prod.script_writer != self.request.user:
+        if not (prod.script_writer == self.request.user and (
+                self.request.user.is_script_writer or self.request.user.is_full_stack)):
             return Response({'details': 'User not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
         section = Section.objects.get(product_id=products_id)
         file = section.pre_contents.all().first().file_contents.all()
@@ -112,7 +113,8 @@ class GetDeveloperVideoContent(APIView):
     def get(self, request, *args, **kwargs):
         products_id = self.kwargs['pk']
         prod = Product.objects.get(id=products_id)
-        if prod.video_editor != self.request.user:
+        if not(prod.video_editor == self.request.user and (
+                self.request.user.is_video_editor or self.request.user.is_full_stack)):
             return Response({'details': 'User not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
         section = Section.objects.get(product_id=products_id)
         video = section.video_content.all()
