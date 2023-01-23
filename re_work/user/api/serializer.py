@@ -1,5 +1,7 @@
 from rest_framework import serializers, status
 from rest_framework.response import Response
+
+from re_work.product.models import Product
 from re_work.user.models import User
 
 
@@ -16,9 +18,17 @@ class DeveloperData(serializers.ModelSerializer):
 
 
 class UserSelection(serializers.ModelSerializer):
+    active_product = serializers.SerializerMethodField("get_active_project")
+
     class Meta:
         model = User
-        fields = ["id", "name"]
+        fields = ["id", "name", 'active_product']
+
+    def get_active_project(self, obj):
+        counts = Product.objects.filter(client_id=obj.id, has_completed=False).count()
+        return counts
+
+
 
 
 class UserCreation(serializers.ModelSerializer):

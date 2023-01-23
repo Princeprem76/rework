@@ -65,9 +65,11 @@ class User_List(RetrieveAPIView):
 
 class Client_List(APIView):
     serializer_class = UserSelection
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    permission_classes = [IsAuthenticated]
 
     def get(self, *args, **kwargs):
+        if not (self.request.user.is_staff_admin or self.request.user.is_admin):
+            return Response({"details": "Not Authorized"}, status=status.HTTP_401_UNAUTHORIZED)
         queryset = User.objects.filter(user_type=1)
         serializer = self.serializer_class(queryset, many=True)
         return Response({"details": serializer.data}, status=status.HTTP_200_OK)

@@ -22,33 +22,63 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class VideoContentSerializer(serializers.ModelSerializer):
+    comment_count = serializers.SerializerMethodField("get_count")
+
     class Meta:
         model = VideoContent
-        fields = ['id', 'video_url', 'duration', 'name']
+        fields = ['id', 'video_url', 'duration', 'name', 'comment_count']
+
+    def get_count(self, obj):
+        counts = VideoContent.objects.get(id=obj.id).comment.all().count()
+        return counts
 
 
 class VideoContentSerializerAdmin(serializers.ModelSerializer):
+    comment_count = serializers.SerializerMethodField("get_count")
+
     class Meta:
         model = VideoContent
-        fields = ['id', 'video_url', 'duration', 'name', 'has_approved']
+        fields = ['id', 'video_url', 'duration', 'name', 'has_approved', 'comment_count']
+
+    def get_count(self, obj):
+        counts = VideoContent.objects.get(id=obj.id).comment.all().count()
+        return counts
 
 
 class FileContentSerializer(serializers.ModelSerializer):
+    comment_count = serializers.SerializerMethodField("get_count")
+
     class Meta:
         model = FileContent
-        fields = ['id', 'files', 'name']
+        fields = ['id', 'files', 'name', "comment_count"]
+
+    def get_count(self, obj):
+        counts = FileContent.objects.get(id=obj.id).comment.all().count()
+        return counts
 
 
 class FileContentSerializerAdmin(serializers.ModelSerializer):
+    comment_count = serializers.SerializerMethodField("get_count")
+
     class Meta:
         model = FileContent
-        fields = ['id', 'files', 'name', 'has_approved']
+        fields = ['id', 'files', 'name', 'has_approved', 'comment_count']
+
+    def get_count(self, obj):
+        counts = FileContent.objects.get(id=obj.id).comment.all().count()
+        return counts
 
 
 class CommonContentSerializer(serializers.ModelSerializer):
+    comment_count = serializers.SerializerMethodField("get_count")
+
     class Meta:
         model = CommonContent
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'comment_count']
+
+    def get_count(self, obj):
+        counts = CommonContent.objects.get(id=obj.id).comment.all().count()
+        return counts
 
 
 class PreContentSerializer(serializers.ModelSerializer):
