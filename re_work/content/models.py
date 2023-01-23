@@ -15,12 +15,14 @@ class Comments(TimeStampAbstractModel):
 class CommonContent(TimeStampAbstractModel):
     name = models.CharField(max_length=255, null=True, blank=True)
     comment = models.ManyToManyField(Comments, related_name="Content_Comment")
+    comment_off = models.BooleanField(default=False)
 
 
 class VideoContent(CommonContent, models.Model):
     duration = models.TimeField(null=True, blank=True)
     video_url = models.URLField(null=True, blank=True)
     has_approved = models.BooleanField(default=False)
+
 
 
 class FileContent(CommonContent, models.Model):

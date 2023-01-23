@@ -26,7 +26,7 @@ class VideoContentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = VideoContent
-        fields = ['id', 'video_url', 'duration', 'name', 'comment_count']
+        fields = ['id', 'video_url', 'duration', 'name', 'comment_count', 'comment_off']
 
     def get_count(self, obj):
         counts = VideoContent.objects.get(id=obj.id).comment.all().count()
@@ -38,7 +38,7 @@ class VideoContentSerializerAdmin(serializers.ModelSerializer):
 
     class Meta:
         model = VideoContent
-        fields = ['id', 'video_url', 'duration', 'name', 'has_approved', 'comment_count']
+        fields = ['id', 'video_url', 'duration', 'name', 'has_approved', 'comment_count', 'comment_off']
 
     def get_count(self, obj):
         counts = VideoContent.objects.get(id=obj.id).comment.all().count()
@@ -50,7 +50,7 @@ class FileContentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FileContent
-        fields = ['id', 'files', 'name', "comment_count"]
+        fields = ['id', 'files', 'name', "comment_count", 'comment_off']
 
     def get_count(self, obj):
         counts = FileContent.objects.get(id=obj.id).comment.all().count()
@@ -62,7 +62,7 @@ class FileContentSerializerAdmin(serializers.ModelSerializer):
 
     class Meta:
         model = FileContent
-        fields = ['id', 'files', 'name', 'has_approved', 'comment_count']
+        fields = ['id', 'files', 'name', 'has_approved', 'comment_count', 'comment_off']
 
     def get_count(self, obj):
         counts = FileContent.objects.get(id=obj.id).comment.all().count()
@@ -74,7 +74,7 @@ class CommonContentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CommonContent
-        fields = ['id', 'name', 'comment_count']
+        fields = ['id', 'name', 'comment_count', 'comment_off']
 
     def get_count(self, obj):
         counts = CommonContent.objects.get(id=obj.id).comment.all().count()

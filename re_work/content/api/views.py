@@ -30,7 +30,8 @@ class InsertVideoContent(APIView):
                 return Response({'details': 'User not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
 
             section = Section.objects.get(product_id=products_id)
-            video, _ = VideoContent.objects.get_or_create(video_url=self.request.data['video_url'],
+            video, _ = VideoContent.objects.get_or_create(name=self.request.data['name'],
+                                                          video_url=self.request.data['video_url'],
                                                           duration=self.request.data['duration'])
             section.video_content.add(video)
             return Response({'details': 'Video added!'}, status=status.HTTP_201_CREATED)
@@ -113,7 +114,7 @@ class GetDeveloperVideoContent(APIView):
     def get(self, request, *args, **kwargs):
         products_id = self.kwargs['pk']
         prod = Product.objects.get(id=products_id)
-        if not(prod.video_editor == self.request.user and (
+        if not (prod.video_editor == self.request.user and (
                 self.request.user.is_video_editor or self.request.user.is_full_stack)):
             return Response({'details': 'User not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
         section = Section.objects.get(product_id=products_id)
@@ -158,7 +159,8 @@ class AddPreContentsFile(APIView):
             section = Section.objects.get(product_id=products_id)
             if not (admin or script or admin_staff or full_stack or section.product.script_writer == self.request.user):
                 return Response({'details': 'User not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
-            file, _ = FileContent.objects.get_or_create(files=self.request.data['files'])
+            file, _ = FileContent.objects.get_or_create(name=self.request.data['name'],
+                                                        files=self.request.data['files'])
             pre = section.pre_contents.all().first()
             pre_file = pre.file_contents.add(file)
             return Response({'details': 'File Added created'}, status=status.HTTP_201_CREATED)
@@ -278,7 +280,7 @@ class AddPostProdContentInternal(APIView):
                 return Response({'details': 'User not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
             products_id = self.kwargs['pk']
             section = Section.objects.get(product_id=products_id)
-            internals, _ = CommonContent.objects.get_or_create(name=self.request.data['editing'])
+            internals, _ = CommonContent.objects.get_or_create(name=self.request.data['internal'])
             postp = section.post_contents.all().first()
             post_internal = postp.editing.add(internals)
             return Response({'details': 'Created'}, status=status.HTTP_201_CREATED)
