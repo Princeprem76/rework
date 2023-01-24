@@ -11,6 +11,7 @@ from ..models import Section, VideoContent, PreProductionContent, PostProduction
 from push_notifications.models import APNSDevice, GCMDevice
 
 # device = GCMDevice.objects.get(registration_id=gcm_reg_id)
+from ...core.permissions import IsAdminStaff
 from ...product.models import Product
 
 
@@ -466,4 +467,31 @@ class ApproveVideoContent(APIView):
         return Response({'details': 'Video has been Approved'}, status=status.HTTP_202_ACCEPTED)
 
 
-'''Total 6 Api'''
+class TurnoffFileComment(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        file_id = self.kwargs['pk']
+        admin = self.request.user.is_admin
+        admin_staff = self.request.user.is_staff_admin
+        if not (admin or admin_staff):
+            return Response({'details': 'User not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
+        file = FileContent.objects.get(id=file_id)
+        file.comment_off = True
+        file.save()
+        return Response({'details': 'Comment Turned off'}, status=status.HTTP_200_OK)
+
+
+class TurnoffVideoComment(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        video_id = self.kwargs['pk']
+        admin = self.request.user.is_admin
+        admin_staff = self.request.user.is_staff_admin
+        if not (admin or admin_staff):
+            return Response({'details': 'User not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
+        video = VideoContent.objects.get(id=video_id)
+        video.comment_off = True
+        video.save()
+        return Response({'details': 'Comment Turned off'}, status=status.HTTP_200_OK)

@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     're_work.review.apps.ReviewConfig',
     're_work.notification.apps.NotificationConfig',
     're_work.product.apps.ProductConfig',
+    'rest_framework_simplejwt.token_blacklist',
 
 ]
 
@@ -117,7 +118,8 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": (
-        "rest_framework.permissions.IsAuthenticated", "rest_framework.permissions.IsAdminUser",),
+        "rest_framework.permissions.IsAuthenticated", "rest_framework.permissions.IsAdminUser",
+        "rest_framework.permissions.BasePermission",),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
@@ -131,8 +133,9 @@ SPECTACULAR_SETTINGS = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
-    "ROTATE_REFRESH_TOKENS": True,
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=240),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
     "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
 }
 
