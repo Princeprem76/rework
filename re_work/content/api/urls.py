@@ -4,13 +4,14 @@ from .views import (InsertVideoContent, GetProductVideoContent, GetProductConten
                     AddPostProdContentDelivery, AddPostProdContentEditing, AddPostProdContentInternal,
                     CreateFileComment, CreateVideoComment, CreateCommonComment, getFileComment, getCommonComment,
                     getVideoComment, GetAdminProductContent, GetDeveloperFileContent, GetDeveloperVideoContent,
-                    ApproveFileContent, ApproveVideoContent)
+                    ApproveFileContent, ApproveVideoContent, GetAdminProductVideoContent)
 
 app_name = 'contents'
 
 urlpatterns = [
     path('insert-video/<int:pk>/', InsertVideoContent.as_view(), name="Insert_Video"),
     path('product-video/<int:pk>/', GetProductVideoContent.as_view(), name="Product_Video"),
+    path('adminproduct-video/<int:pk>/', GetAdminProductVideoContent.as_view(), name="Admin_Product_Video"),
     path('product-contents/<int:pk>/', GetProductContent.as_view(), name="Prod_Contents"),
     path('admin-product-contents/<int:pk>/', GetAdminProductContent.as_view(), name="Admin_Prod_Contents"),
     path('dev-filecontent/<int:pk>/', GetDeveloperFileContent.as_view(), name="Developer_file"),
