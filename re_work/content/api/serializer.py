@@ -88,8 +88,8 @@ class PreContentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PreProductionContent
-        fields = ['id', 'location', 'props', 'model', 'has_video', 'has_location', 'has_props',
-                  'has_file', 'has_model', 'complete_video', 'complete_location', 'complete_props', 'complete_file',
+        fields = ['id', 'location', 'props', 'model', 'has_location', 'has_props',
+                  'has_file', 'has_model', 'complete_location', 'complete_props', 'complete_file',
                   'complete_model', ]
 
 
