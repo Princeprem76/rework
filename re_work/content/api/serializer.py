@@ -106,5 +106,5 @@ class PostContentSerializer(serializers.ModelSerializer):
     class Meta:
         model = PostProductionContent
         fields = ['id', 'editing', 'internal', 'delivery', 'has_editing', 'has_internal', 'has_delivery',
-                  'complete_delivery', 'complete_internal', 'complete_delivery']
+                  'complete_editing', 'complete_internal', 'complete_delivery']
 
