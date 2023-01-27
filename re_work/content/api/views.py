@@ -1,11 +1,12 @@
 from rest_framework import status
+from rest_framework.generics import UpdateAPIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .serializer import VideoContentSerializer, PreContentSerializer, ProductionContentSerializer, \
     PostContentSerializer, CommentSerializer, FileContentSerializer, FileContentSerializerAdmin, \
-    VideoContentSerializerAdmin
+    VideoContentSerializerAdmin, CommonContentSerializer
 from ..models import Section, VideoContent, PreProductionContent, PostProductionContent, ProductionContent, FileContent, \
     CommonContent, Comments
 from push_notifications.models import APNSDevice, GCMDevice
@@ -52,6 +53,72 @@ class GetProductVideoContent(APIView):
             return Response({'contents': serializer.data}, status=status.HTTP_200_OK)
         except:
             return Response({'contents': 'No video present'}, status=status.HTTP_200_OK)
+
+
+class PatchPreContent(UpdateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminStaff]
+    serializer_class = PreContentSerializer
+    queryset = PreProductionContent.objects.all()
+    lookup_url_kwarg = 'pk'
+
+    def patch(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response({'details': 'Updated!'}, status=status.HTTP_200_OK)
+
+
+class PatchPostContent(UpdateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminStaff]
+    serializer_class = PostContentSerializer
+    queryset = PostProductionContent.objects.all()
+    lookup_url_kwarg = 'pk'
+
+    def patch(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response({'details': 'Updated!'}, status=status.HTTP_200_OK)
+
+
+class PatchProdContent(UpdateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminStaff]
+    serializer_class = ProductionContentSerializer
+    queryset = ProductionContent.objects.all()
+    lookup_url_kwarg = 'pk'
+
+    def patch(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response({'details': 'Updated!'}, status=status.HTTP_200_OK)
+
+
+class PatchCommonContent(UpdateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminStaff]
+    serializer_class = CommonContentSerializer
+    queryset = CommonContent.objects.all()
+    lookup_url_kwarg = 'pk'
+
+    def patch(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response({'details': 'Updated!'}, status=status.HTTP_200_OK)
+
+
+class UpdateEditing(APIView):
+    permission_classes = [IsAuthenticated, IsAdminStaff]
+
+    def post(self, *args, **kwargs):
+        post_content = PostProductionContent.objects.get(id=self.kwargs['pk'])
+        post_content.complete_editing = True
+        post_content.save()
+        return Response({'details': 'Updated!'})
 
 
 class GetAdminProductVideoContent(APIView):

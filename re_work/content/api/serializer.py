@@ -93,6 +93,7 @@ class PreContentSerializer(serializers.ModelSerializer):
                   'complete_model', ]
 
 
+
 class ProductionContentSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductionContent

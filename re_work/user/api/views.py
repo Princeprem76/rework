@@ -44,11 +44,15 @@ class Create_User(CreateAPIView):
 class Update_User(UpdateAPIView):
     serializer_class = UserCreation
     permission_classes = [IsAuthenticated, ]
+    queryset = User.objects.all()
+    lookup_url_kwarg = 'pk'
 
-    def get_queryset(self, *args, **kwargs):
-        user = User.objects.get(id=self.kwargs["pk"])
-        serializer = UserData(user, many=False)
-        return Response({"user_profile": serializer.data}, status=status.HTTP_200_OK)
+    def patch(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response({'details': 'Updated!'}, status=status.HTTP_200_OK)
 
 
 class Delete_User(DestroyAPIView):

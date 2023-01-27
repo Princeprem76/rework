@@ -4,7 +4,8 @@ from .views import (InsertVideoContent, GetProductVideoContent, GetProductConten
                     AddPostProdContentDelivery, AddPostProdContentEditing, AddPostProdContentInternal,
                     CreateFileComment, CreateVideoComment, CreateCommonComment, getFileComment, getCommonComment,
                     getVideoComment, GetAdminProductContent, GetDeveloperFileContent, GetDeveloperVideoContent,
-                    ApproveFileContent, ApproveVideoContent, GetAdminProductVideoContent)
+                    ApproveFileContent, ApproveVideoContent, GetAdminProductVideoContent, PatchPreContent,
+                    PatchCommonContent, PatchPostContent, PatchProdContent)
 
 app_name = 'contents'
 
@@ -32,4 +33,8 @@ urlpatterns = [
     path('add-file/<int:pk>/', AddPreContentsFile.as_view(), name="Add_File"),
     path('approvefile/<int:pk>/', ApproveFileContent.as_view(), name="ApproveFile"),
     path('approvevideo/<int:pk>/', ApproveVideoContent.as_view(), name="ApproveVideo"),
+    path('updateprecontent/<int:pk>/', PatchPreContent.as_view(), name="UpdateProps"),
+    path('update-common/<int:pk>/', PatchCommonContent.as_view(), name="UpdateCommon"),
+    path('update-post/<int:pk>/', PatchPostContent.as_view(), name="UpdatePost"),
+    path('update-prod/<int:pk>/', PatchProdContent.as_view(), name="UpdateProd"),
 ]

@@ -18,12 +18,16 @@ class CreateProduct(CreateAPIView):
 
 class UpdateProduct(UpdateAPIView):
     serializer_class = ProductCreateSerializer
-    permission_classes = [IsAuthenticated, ]
+    permission_classes = [IsAuthenticated, IsAdminStaff]
+    queryset = Product.objects.all()
+    lookup_url_kwarg = 'pk'
 
-    def get_queryset(self, *args, **kwargs):
-        product = Product.objects.get(id=self.kwargs["pk"])
-        serializer = ProductDataSerializer(product, many=False)
-        return Response({"user_profile": serializer.data}, status=status.HTTP_200_OK)
+    def patch(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response({'details': 'Updated!'}, status=status.HTTP_200_OK)
 
 
 class ProductList(APIView):
@@ -35,7 +39,7 @@ class ProductList(APIView):
         # admin_staff = self.request.user.is_staff_admin
         # if not (admin or admin_staff):
         #     return Response({'details': 'User not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
-        product = Product.objects.filter(client_id=self.kwargs["pk"])
+        product = Product.objects.filter(client_id=self.kwargs["pk"], has_completed=False)
         serializer = self.serializer_class(product, many=True)
         return Response({"product_details": serializer.data}, status=status.HTTP_200_OK)
 
