@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from rest_framework import status
 from rest_framework.generics import UpdateAPIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
@@ -514,7 +516,8 @@ class ApproveFileContent(APIView):
         if not (admin or admin_staff):
             return Response({'details': 'User not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
         file = FileContent.objects.get(id=file_id)
-        file.has_approved = True
+        file.has_approved = request.data['has_approved']
+        file.comment_time = datetime.strptime(request.data['comment_time'], '%Y-%m-%d %H:%M:%S')
         file.save()
         return Response({'details': 'File has been Approved'}, status=status.HTTP_202_ACCEPTED)
 
@@ -529,7 +532,8 @@ class ApproveVideoContent(APIView):
         if not (admin or admin_staff):
             return Response({'details': 'User not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
         video = VideoContent.objects.get(id=video_id)
-        video.has_approved = True
+        video.has_approved = request.data['has_approved']
+        video.comment_time = datetime.strptime(request.data['comment_time'], '%Y-%m-%d %H:%M:%S')
         video.save()
         return Response({'details': 'Video has been Approved'}, status=status.HTTP_202_ACCEPTED)
 

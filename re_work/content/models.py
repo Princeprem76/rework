@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 
 # Create your models here.
@@ -16,13 +18,24 @@ class CommonContent(TimeStampAbstractModel):
     name = models.CharField(max_length=255, null=True, blank=True)
     comment = models.ManyToManyField(Comments, related_name="Content_Comment")
     comment_off = models.BooleanField(default=False)
+    comment_time = models.DateTimeField(null=True, blank=True)
+
+    def turn_off_comment(self):
+        if self.comment_time is not None:
+            if self.comment_time <= datetime.datetime.now():
+                self.comment_off = True
+            else:
+                self.comment_off = False
+        else:
+            self.comment_off = True
+        self.save()
+        return self.comment_off
 
 
 class VideoContent(CommonContent, models.Model):
     duration = models.TimeField(null=True, blank=True)
     video_url = models.URLField(null=True, blank=True)
     has_approved = models.BooleanField(default=False)
-
 
 
 class FileContent(CommonContent, models.Model):

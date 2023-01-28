@@ -12,8 +12,8 @@ class ProductDataSerializer(serializers.ModelSerializer):
 
 
 class ProductAdminDataSerializer(serializers.ModelSerializer):
-    video_editor = serializers.CharField(source="video_editor.name", read_only=True, allow_null=True)
-    script_writer = serializers.CharField(source="script_writer.name", read_only=True, allow_null=True)
+    # video_editor = serializers.CharField(source="video_editor.name", read_only=True, allow_null=True)
+    # script_writer = serializers.CharField(source="script_writer.name", read_only=True, allow_null=True)
 
     class Meta:
         model = Product

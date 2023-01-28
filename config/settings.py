@@ -121,6 +121,7 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticated", "rest_framework.permissions.IsAdminUser",
         "rest_framework.permissions.BasePermission",),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    'DATETIME_FORMAT': "%Y-%m-%d %H:%M:%S",
 }
 
 SPECTACULAR_SETTINGS = {
