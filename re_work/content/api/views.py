@@ -113,16 +113,6 @@ class PatchCommonContent(UpdateAPIView):
         return Response({'details': 'Updated!'}, status=status.HTTP_200_OK)
 
 
-class UpdateEditing(APIView):
-    permission_classes = [IsAuthenticated, IsAdminStaff]
-
-    def post(self, *args, **kwargs):
-        post_content = PostProductionContent.objects.get(id=self.kwargs['pk'])
-        post_content.complete_editing = True
-        post_content.save()
-        return Response({'details': 'Updated!'})
-
-
 class GetAdminProductVideoContent(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -538,31 +528,29 @@ class ApproveVideoContent(APIView):
         return Response({'details': 'Video has been Approved'}, status=status.HTTP_202_ACCEPTED)
 
 
-class TurnoffFileComment(APIView):
+class TurnoffFileComment(UpdateAPIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = FileContentSerializerAdmin
+    queryset = ProductionContent.objects.all()
+    lookup_url_kwarg = 'pk'
 
-    def post(self, request, *args, **kwargs):
-        file_id = self.kwargs['pk']
-        admin = self.request.user.is_admin
-        admin_staff = self.request.user.is_staff_admin
-        if not (admin or admin_staff):
-            return Response({'details': 'User not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
-        file = FileContent.objects.get(id=file_id)
-        file.comment_off = True
-        file.save()
-        return Response({'details': 'Comment Turned off'}, status=status.HTTP_200_OK)
+    def patch(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response({'details': 'Updated!'}, status=status.HTTP_200_OK)
 
 
-class TurnoffVideoComment(APIView):
+class TurnoffVideoComment(UpdateAPIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = VideoContentSerializerAdmin
+    queryset = ProductionContent.objects.all()
+    lookup_url_kwarg = 'pk'
 
-    def post(self, request, *args, **kwargs):
-        video_id = self.kwargs['pk']
-        admin = self.request.user.is_admin
-        admin_staff = self.request.user.is_staff_admin
-        if not (admin or admin_staff):
-            return Response({'details': 'User not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
-        video = VideoContent.objects.get(id=video_id)
-        video.comment_off = True
-        video.save()
-        return Response({'details': 'Comment Turned off'}, status=status.HTTP_200_OK)
+    def patch(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response({'details': 'Updated!'}, status=status.HTTP_200_OK)

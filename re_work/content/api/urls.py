@@ -5,7 +5,7 @@ from .views import (InsertVideoContent, GetProductVideoContent, GetProductConten
                     CreateFileComment, CreateVideoComment, CreateCommonComment, getFileComment, getCommonComment,
                     getVideoComment, GetAdminProductContent, GetDeveloperFileContent, GetDeveloperVideoContent,
                     ApproveFileContent, ApproveVideoContent, GetAdminProductVideoContent, PatchPreContent,
-                    PatchCommonContent, PatchPostContent, PatchProdContent)
+                    PatchCommonContent, PatchPostContent, PatchProdContent, TurnoffFileComment, TurnoffVideoComment)
 
 app_name = 'contents'
 
@@ -37,4 +37,6 @@ urlpatterns = [
     path('update-common/<int:pk>/', PatchCommonContent.as_view(), name="UpdateCommon"),
     path('update-post/<int:pk>/', PatchPostContent.as_view(), name="UpdatePost"),
     path('update-prod/<int:pk>/', PatchProdContent.as_view(), name="UpdateProd"),
+    path('turnoff-file-comment/<int:pk>/', TurnoffFileComment.as_view(), name="Off_File_Comment"),
+    path('turnoff-video-comment/<int:pk>/', TurnoffVideoComment.as_view(), name="Off_Video_Comment"),
 ]
