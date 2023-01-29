@@ -80,7 +80,7 @@ class DeveloperProductView(APIView):
 
     def get(self, *args, **kwargs):
         product = Product.objects.filter(
-            (Q(video_editor=self.request.user) | Q(script_writer=self.request.user)) and Q(has_completed=False))
+            Q(video_editor=self.request.user) | Q(script_writer=self.request.user), has_completed=False)
         serializer = self.serializer_class(product, many=True)
         return Response({"product_details": serializer.data}, status=status.HTTP_200_OK)
 

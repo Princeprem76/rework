@@ -38,6 +38,7 @@ class InsertVideoContent(APIView):
                                                           video_url=self.request.data['video_url'],
                                                           duration=self.request.data['duration'])
             section.video_content.add(video)
+            section.save()
             return Response({'details': 'Video added!'}, status=status.HTTP_201_CREATED)
         except:
             return Response({'details': 'Error!'})
