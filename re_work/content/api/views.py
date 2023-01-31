@@ -51,7 +51,7 @@ class GetProductVideoContent(APIView):
         try:
             products_id = self.kwargs['pk']
             section = Section.objects.get(product_id=products_id)
-            products = section.video_content.all().filter(has_approved=True).order_by('-created_at')
+            products = section.video_content.all().filter(has_approved=True).order_by('created_at')
             serializer = VideoContentSerializer(products, many=True)
             return Response({'contents': serializer.data}, status=status.HTTP_200_OK)
         except:
