@@ -6,9 +6,18 @@ from re_work.product.models import Product
 
 
 class ProductDataSerializer(serializers.ModelSerializer):
+    total_complete_percent = serializers.SerializerMethodField("total_complete_percents")
+
     class Meta:
         model = Product
-        fields = ['id', 'product_name', 'description', 'logo']
+        fields = ['id', 'product_name', 'description', 'logo', 'total_complete_percent']
+
+    def total_complete_percents(self, obj):
+        obj = Section.objects.get(product_id=obj.id)
+        total_content = obj.total_contents()
+        total_complete = obj.total_complete()
+        percent = (total_complete / total_content) * 100
+        return percent
 
 
 class ProductAdminDataSerializer(serializers.ModelSerializer):
@@ -17,7 +26,8 @@ class ProductAdminDataSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'product_name', 'description', 'logo', 'video_editor', 'script_writer']
+        fields = ['id', 'product_name', 'description', 'logo', 'video_editor', 'script_writer',
+                  ]
 
 
 class ProductCreateSerializer(serializers.ModelSerializer):

@@ -57,10 +57,40 @@ class PreProductionContent(models.Model):
     complete_file = models.BooleanField(default=False)
     complete_model = models.BooleanField(default=False)
 
+    def total_contents(self):
+        count = 0
+        if self.has_file:
+            count += 1
+        if self.has_props:
+            count += 1
+        if self.has_model:
+            count += 1
+        if self.has_location:
+            count += 1
+        return count
+
+    def total_complete(self):
+        count = 0
+        if self.complete_file:
+            count += 1
+        if self.complete_props:
+            count += 1
+        if self.complete_model:
+            count += 1
+        if self.complete_location:
+            count += 1
+        return count
+
 
 class ProductionContent(models.Model):
     video_completion = models.DateTimeField(null=True, blank=True)
     complete_video = models.BooleanField(default=False)
+
+    def total_complete(self):
+        count = 0
+        if self.complete_video:
+            count += 1
+        return count
 
 
 class PostProductionContent(models.Model):
@@ -74,6 +104,26 @@ class PostProductionContent(models.Model):
     complete_internal = models.BooleanField(default=False)
     complete_delivery = models.BooleanField(default=False)
 
+    def total_contents(self):
+        count = 0
+        if self.has_internal:
+            count += 1
+        if self.has_delivery:
+            count += 1
+        if self.has_editing:
+            count += 1
+        return count
+
+    def total_complete(self):
+        count = 0
+        if self.complete_internal:
+            count += 1
+        if self.complete_delivery:
+            count += 1
+        if self.complete_editing:
+            count += 1
+        return count
+
 
 class Section(models.Model):
     product = models.ForeignKey(Product, related_name="products_name", on_delete=models.SET_NULL, null=True, blank=True)
@@ -81,3 +131,11 @@ class Section(models.Model):
     pre_contents = models.ManyToManyField(PreProductionContent, related_name="pre_production_content")
     production_contents = models.ManyToManyField(ProductionContent, related_name="production_content")
     post_contents = models.ManyToManyField(PostProductionContent, related_name="post_production_content")
+
+    def total_contents(self):
+        count = self.pre_contents.all().first().total_contents() + self.post_contents.all().first().total_contents() + 1
+        return count
+
+    def total_complete(self):
+        count = self.pre_contents.all().first().total_complete() + self.production_contents.all().first().total_complete() + self.post_contents.all().first().total_complete()
+        return count

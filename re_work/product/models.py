@@ -15,3 +15,5 @@ class Product(models.Model):
 
     def __str__(self):
         return f"{self.product_name} ({self.client.name})"
+
+
