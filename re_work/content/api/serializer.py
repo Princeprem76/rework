@@ -99,7 +99,7 @@ class PreContentSerializer(serializers.ModelSerializer):
 class ProductionContentSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductionContent
-        fields = ['id', 'video_completion', 'complete_video']
+        fields = ['id', 'video_completion', 'complete_video', 'has_video']
 
 
 class PostContentSerializer(serializers.ModelSerializer):

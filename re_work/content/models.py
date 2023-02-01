@@ -85,6 +85,7 @@ class PreProductionContent(models.Model):
 class ProductionContent(models.Model):
     video_completion = models.DateTimeField(null=True, blank=True)
     complete_video = models.BooleanField(default=False)
+    has_video = models.BooleanField(default=True)
 
     def total_complete(self):
         count = 0
