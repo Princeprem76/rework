@@ -1,3 +1,5 @@
+import re
+
 from rest_framework import serializers
 
 from re_work.content.models import VideoContent, CommonContent, PreProductionContent, ProductionContent, \
@@ -23,28 +25,40 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class VideoContentSerializer(serializers.ModelSerializer):
     comment_count = serializers.SerializerMethodField("get_count")
+    video_urls = serializers.SerializerMethodField("get_video_id")
 
     class Meta:
         model = VideoContent
-        fields = ['id', 'video_url', 'duration', 'name', 'comment_count', 'turn_off_comment', 'created_at',
+        fields = ['id', 'video_urls', 'duration', 'name', 'comment_count', 'turn_off_comment', 'created_at',
                   'comment_time']
 
     def get_count(self, obj):
         counts = VideoContent.objects.get(id=obj.id).comment.all().count()
         return counts
 
+    def get_video_id(self, obj):
+        txt = obj.video_url
+        x = re.split("/", txt, 0)
+        return x[5]
+
 
 class VideoContentSerializerAdmin(serializers.ModelSerializer):
     comment_count = serializers.SerializerMethodField("get_count")
+    video_urls = serializers.SerializerMethodField("get_video_id")
 
     class Meta:
         model = VideoContent
-        fields = ['id', 'video_url', 'duration', 'name', 'has_approved', 'comment_count', 'turn_off_comment',
+        fields = ['id', 'video_urls', 'duration', 'name', 'has_approved', 'comment_count', 'turn_off_comment',
                   'created_at', 'comment_time']
 
     def get_count(self, obj):
         counts = VideoContent.objects.get(id=obj.id).comment.all().count()
         return counts
+
+    def get_video_id(self, obj):
+        txt = obj.video_url
+        x = re.split("/", txt, 0)
+        return x[5]
 
 
 class FileContentSerializer(serializers.ModelSerializer):
