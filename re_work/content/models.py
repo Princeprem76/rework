@@ -1,11 +1,15 @@
-import datetime
+from datetime import datetime
 
+import pytz
+from django.utils import timezone
 from django.db import models
 
 # Create your models here.
 from re_work.core.models import TimeStampAbstractModel
 from re_work.product.models import Product
 from re_work.user.models import User
+
+tz = pytz.timezone('Asia/Kathmandu')
 
 
 class Comments(TimeStampAbstractModel):
@@ -22,13 +26,14 @@ class CommonContent(TimeStampAbstractModel):
 
     def turn_off_comment(self):
         if self.comment_time is not None:
-            if self.comment_time <= datetime.datetime.now():
+            now = datetime.now()
+            if self.comment_time < datetime.strptime(now.strftime("%Y-%m-%d %H:%M:%S"),
+                                                     "%Y-%m-%d %H:%M:%S"):
                 self.comment_off = True
             else:
                 self.comment_off = False
         else:
             self.comment_off = True
-        self.save()
         return self.comment_off
 
 

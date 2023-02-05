@@ -147,11 +147,12 @@ PASSWORD_RESET_TIMEOUT = 900
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kathmandu'
 
 USE_I18N = True
 
-USE_TZ = True
+USE_TZ = False
+
 
 AUTH_USER_MODEL = 'user.User'
 # Static files (CSS, JavaScript, Images)
