@@ -118,14 +118,14 @@ class GetAdminProductVideoContent(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        # try:
+        try:
             products_id = self.kwargs['pk']
             section = Section.objects.get(product_id=products_id)
             products = section.video_content.all()
             serializer = VideoContentSerializerAdmin(products, many=True)
             return Response({'contents': serializer.data}, status=status.HTTP_200_OK)
-        # except:
-        #     return Response({'contents': 'No video present'}, status=status.HTTP_200_OK)
+        except:
+            return Response({'contents': 'No video present'}, status=status.HTTP_200_OK)
 
 
 class GetAdminProductContent(APIView):
