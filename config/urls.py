@@ -20,8 +20,10 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import path, include
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework.routers import DefaultRouter
+from push_notifications.api.rest_framework import GCMDeviceAuthorizedViewSet
 
 router = DefaultRouter()
+router.register(r"devices/gcm", GCMDeviceAuthorizedViewSet)
 
 urlpatterns = [
                   path('admin/', admin.site.urls),

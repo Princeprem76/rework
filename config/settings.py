@@ -11,10 +11,13 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 from datetime import timedelta
 from pathlib import Path
+import redis
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 import environ
 
+env = environ.Env()
+environ.Env.read_env()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
@@ -29,29 +32,35 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 # Application definition
-
-INSTALLED_APPS = [
+DJANGO_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+]
+
+THIRD_PARTY_APPS = [
     'rest_framework_swagger',
     'rest_framework',
     'rest_framework_simplejwt',
     "drf_spectacular",
     'corsheaders',
     'push_notifications',
+    'rest_framework_simplejwt.token_blacklist',
+    "huey.contrib.djhuey",
+]
+
+LOCAL_APPS = [
     're_work.user.apps.UserConfig',
     're_work.core.apps.CoreConfig',
     're_work.content.apps.ContentConfig',
     're_work.review.apps.ReviewConfig',
     're_work.notification.apps.NotificationConfig',
     're_work.product.apps.ProductConfig',
-    'rest_framework_simplejwt.token_blacklist',
-
 ]
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -153,7 +162,6 @@ USE_I18N = True
 
 USE_TZ = False
 
-
 AUTH_USER_MODEL = 'user.User'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
@@ -169,11 +177,45 @@ MEDIA_URL = '/media/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 PUSH_NOTIFICATIONS_SETTINGS = {
-    "FCM_API_KEY": "[your api key]",
+    # "FCM_API_KEY": env.str("FCM_API_KEY"),
+    "FCM_API_KEY": "sssssewf",
 }
 
-env = environ.Env()
-environ.Env.read_env()
+# hyey settings.py
+
+pool = redis.ConnectionPool(host="redis", port=6379, db=0)
+
+HUEY = {
+    "huey_class": "huey.RedisHuey",  # Huey implementation to use.
+    "name": DATABASES["default"]["NAME"],  # Use db name for huey.
+    "results": True,  # Store return values of tasks.
+    "store_none": False,  # If a task returns None, do not save to results.
+    "immediate": DEBUG,  # If DEBUG=True, run synchronously.
+    "utc": True,  # Use UTC for all times internally.
+    "blocking": True,  # Perform blocking pop rather than poll Redis.
+    "connection": {
+        # "host": "redis",
+        # "port": 6379,
+        # "db": 0,
+        "connection_pool": pool,
+        # huey-specific connection parameters.
+        "read_timeout": 1,  # If not polling (blocking pop), use timeout.
+        "url": None,  # Allow Redis config via a DSN.
+    },
+    "consumer": {
+        "workers": 4,
+        "worker_type": "thread",
+        "initial_delay": 0.1,  # Smallest polling interval, same as -d.
+        "backoff": 1.15,  # Exponential backoff using this rate, -b.
+        "max_delay": 10.0,  # Max possible polling interval, -m.
+        "scheduler_interval": 1,  # Check schedule every second, -s.
+        "periodic": True,  # Enable crontab feature.
+        "check_worker_health": True,  # Enable worker health checks.
+        "health_check_interval": 5,  # Check worker health every second.
+    },
+}
+# Django push notification
+UPDATE_ON_DUPLICATE_REG_ID = True
 
 # EMAIL_HOST = 'smtp.sendgrid.net'
 # EMAIL_PORT = 587
