@@ -73,6 +73,18 @@ class FileContentSerializer(serializers.ModelSerializer):
         return counts
 
 
+class FileContentUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FileContent
+        fields = ['id', 'name', 'comment_time', 'comment_off', 'files', 'has_approved']
+
+
+class VideoContentUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FileContent
+        fields = ['id', 'name', 'comment_time', 'comment_off', 'video_url', 'duration', 'has_approved']
+
+
 class FileContentSerializerAdmin(serializers.ModelSerializer):
     comment_count = serializers.SerializerMethodField("get_count")
 

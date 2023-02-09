@@ -8,14 +8,16 @@ from rest_framework.views import APIView
 
 from .serializer import VideoContentSerializer, PreContentSerializer, ProductionContentSerializer, \
     PostContentSerializer, CommentSerializer, FileContentSerializer, FileContentSerializerAdmin, \
-    VideoContentSerializerAdmin, CommonContentSerializer
+    VideoContentSerializerAdmin, CommonContentSerializer, FileContentUpdateSerializer, VideoContentUpdateSerializer
 from ..models import Section, VideoContent, PreProductionContent, PostProductionContent, ProductionContent, FileContent, \
     CommonContent, Comments
 from push_notifications.models import APNSDevice, GCMDevice
 
 # device = GCMDevice.objects.get(registration_id=gcm_reg_id)
 from ...core.permissions import IsAdminStaff
+from ...notification.mixins import send_push_notification
 from ...product.models import Product
+from ...user.models import User
 
 
 class InsertVideoContent(APIView):
@@ -39,6 +41,10 @@ class InsertVideoContent(APIView):
                                                           duration=self.request.data['duration'])
             section.video_content.add(video)
             section.save()
+            messages = "New Video has been uploaded to {}! Approval is remaining".format(section.product__product_name)
+            users = User.objects.filter(user_type__in=[2, 6])
+            print(users)
+            send_push_notification(message=messages, users=users, product_id=products_id, type="video")
             return Response({'details': 'Video added!'}, status=status.HTTP_201_CREATED)
         except:
             return Response({'details': 'Error!'})
@@ -410,10 +416,19 @@ class CreateVideoComment(APIView):
     def post(self, request, *args, **kwargs):
         content_id = self.kwargs['pk']
         comment = request.data['comment']
-        com, _ = Comments.objects.get_or_create(comment=comment, user=self.request.user)
+        com = Comments.objects.create(comment=comment, user=self.request.user)
         video = VideoContent.objects.get(id=content_id)
         video.comment.add(com)
         video.save()
+        sec = Section.objects.filter(video_content=content_id)
+        sec = sec.first()
+        pro = Product.objects.get(id=sec.product_id)
+        users = [pro.video_editor_id, pro.client_id]
+        for us in User.objects.filter(user_type__in=[2, 6]):
+            users.append(us.id)
+        users.remove(request.user.id)
+        messages = "New comment has been added to Video!"
+        send_push_notification(message=messages, users=users, product_id=sec.product_id, type="video")
         return Response({"details": "Comment Added!"})
 
 
@@ -423,7 +438,7 @@ class CreateVideoCommentReply(APIView):
     def post(self, request, *args, **kwargs):
         content_id = self.kwargs['pk']
         comment = request.data['comment']
-        com, _ = Comments.objects.get_or_create(comment=comment, user=self.request.user)
+        com = Comments.objects.create(comment=comment, user=self.request.user)
         video = VideoContent.objects.get(id=content_id)
         if video.comment is None:
             video.comment = com
@@ -445,6 +460,15 @@ class CreateFileComment(APIView):
         file = FileContent.objects.get(id=content_id)
         file.comment.add(com)
         file.save()
+        sec = Section.objects.filter(video_content=content_id)
+        sec = sec.first()
+        pro = Product.objects.get(id=sec.product_id)
+        users = [pro.script_writer_id, pro.client_id]
+        for us in User.objects.filter(user_type__in=[2, 6]):
+            users.append(us.id)
+        users.remove(request.user.id)
+        messages = "New comment has been added to File!"
+        send_push_notification(message=messages, users=users, product_id=sec.product_id, type="file")
         return Response({"details": "Comment Added!"})
 
 
@@ -510,6 +534,8 @@ class ApproveFileContent(APIView):
         file.has_approved = request.data['has_approved']
         file.comment_time = datetime.strptime(request.data['comment_time'], '%Y-%m-%d %H:%M:%S')
         file.save()
+        messages = "New Script has been uploaded! You can provide comment till {}".format(request.data['comment_time'])
+        send_push_notification(message=messages, users=[], product_id=id, type="video")
         return Response({'details': 'File has been Approved'}, status=status.HTTP_202_ACCEPTED)
 
 
@@ -526,13 +552,15 @@ class ApproveVideoContent(APIView):
         video.has_approved = request.data['has_approved']
         video.comment_time = datetime.strptime(request.data['comment_time'], '%Y-%m-%d %H:%M:%S')
         video.save()
+        messages = "New Video has been uploaded! You can provide comment till {}".format(request.data['comment_time'])
+        send_push_notification(message=messages, users=[], product_id=id, type="video")
         return Response({'details': 'Video has been Approved'}, status=status.HTTP_202_ACCEPTED)
 
 
 class TurnoffFileComment(UpdateAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = FileContentSerializerAdmin
-    queryset = ProductionContent.objects.all()
+    permission_classes = [IsAuthenticated, IsAdminStaff]
+    serializer_class = FileContentUpdateSerializer
+    queryset = FileContent.objects.all()
     lookup_url_kwarg = 'pk'
 
     def patch(self, request, *args, **kwargs):
@@ -544,9 +572,9 @@ class TurnoffFileComment(UpdateAPIView):
 
 
 class TurnoffVideoComment(UpdateAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = VideoContentSerializerAdmin
-    queryset = ProductionContent.objects.all()
+    permission_classes = [IsAuthenticated, IsAdminStaff]
+    serializer_class = VideoContentUpdateSerializer
+    queryset = VideoContent.objects.all()
     lookup_url_kwarg = 'pk'
 
     def patch(self, request, *args, **kwargs):
