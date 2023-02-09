@@ -81,7 +81,7 @@ class FileContentUpdateSerializer(serializers.ModelSerializer):
 
 class VideoContentUpdateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = FileContent
+        model = VideoContent
         fields = ['id', 'name', 'comment_time', 'comment_off', 'video_url', 'duration', 'has_approved']
 
 
