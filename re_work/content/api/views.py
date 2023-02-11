@@ -288,7 +288,7 @@ class AddModelContents(APIView):
             section = Section.objects.get(product_id=products_id)
             models, _ = CommonContent.objects.get_or_create(name=self.request.data['model'])
             pre = section.pre_contents.all().first()
-            pre_model = pre.location.add(models)
+            pre_model = pre.model.add(models)
             return Response({'details': 'Models created'}, status=status.HTTP_201_CREATED)
 
         except:
