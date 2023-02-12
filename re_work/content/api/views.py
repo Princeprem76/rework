@@ -306,7 +306,7 @@ class AddProdContent(APIView):
                 return Response({'details': 'User not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
             products_id = self.kwargs['pk']
             section = Section.objects.get(product_id=products_id)
-            date = self.request.data['date']
+            date = datetime.strptime(request.data['date'], '%Y-%m-%d %H:%M:%S')
             prod = section.production_contents.all().first()
             prod.video_completion = date
             prod.save()
@@ -367,7 +367,7 @@ class AddPostProdContentDelivery(APIView):
                 return Response({'details': 'User not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
             products_id = self.kwargs['pk']
             section = Section.objects.get(product_id=products_id)
-            date = self.request.data['date']
+            date = datetime.strptime(request.data['date'], '%Y-%m-%d %H:%M:%S')
             postp = section.post_contents.all().first()
             postp.delivery = date
             postp.save()
