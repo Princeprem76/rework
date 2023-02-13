@@ -36,7 +36,7 @@ class InsertVideoContent(APIView):
                 return Response({'details': 'User not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
 
             section = Section.objects.get(product_id=products_id)
-            video, _ = VideoContent.objects.get_or_create(name=self.request.data['name'],
+            video = VideoContent.objects.create(name=self.request.data['name'],
                                                           video_url=self.request.data['video_url'],
                                                           duration=self.request.data['duration'])
             section.video_content.add(video)
@@ -226,7 +226,7 @@ class AddPreContentsFile(APIView):
             section = Section.objects.get(product_id=products_id)
             if not (admin or script or admin_staff or full_stack or section.product.script_writer == self.request.user):
                 return Response({'details': 'User not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
-            file, _ = FileContent.objects.create(name=self.request.data['name'],
+            file = FileContent.objects.create(name=self.request.data['name'],
                                                         files=self.request.data['files'])
             pre = section.pre_contents.all().first()
             pre_file = pre.file_contents.add(file)
@@ -246,7 +246,7 @@ class AddLocationContents(APIView):
                 return Response({'details': 'User not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
             products_id = self.kwargs['pk']
             section = Section.objects.get(product_id=products_id)
-            name, _ = CommonContent.objects.create(name=self.request.data['name'])
+            name = CommonContent.objects.create(name=self.request.data['name'])
             pre = section.pre_contents.all().first()
             pre_location = pre.location.add(name)
             return Response({'details': 'Location created'}, status=status.HTTP_201_CREATED)
@@ -266,7 +266,7 @@ class AddPropsContents(APIView):
                 return Response({'details': 'User not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
             products_id = self.kwargs['pk']
             section = Section.objects.get(product_id=products_id)
-            prop, _ = CommonContent.objects.create(name=self.request.data['props'])
+            prop = CommonContent.objects.create(name=self.request.data['props'])
             pre = section.pre_contents.all().first()
             pre_prop = pre.props.add(prop)
             return Response({'details': 'Props created'}, status=status.HTTP_201_CREATED)
@@ -286,7 +286,7 @@ class AddModelContents(APIView):
                 return Response({'details': 'User not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
             products_id = self.kwargs['pk']
             section = Section.objects.get(product_id=products_id)
-            models, _ = CommonContent.objects.create(name=self.request.data['model'])
+            models = CommonContent.objects.create(name=self.request.data['model'])
             pre = section.pre_contents.all().first()
             pre_model = pre.model.add(models)
             return Response({'details': 'Models created'}, status=status.HTTP_201_CREATED)
@@ -456,7 +456,7 @@ class CreateFileComment(APIView):
     def post(self, request, *args, **kwargs):
         content_id = self.kwargs['pk']
         comment = request.data['comment']
-        com, _ = Comments.objects.get_or_create(comment=comment, user=self.request.user)
+        com = Comments.objects.create(comment=comment, user=self.request.user)
         file = FileContent.objects.get(id=content_id)
         file.comment.add(com)
         file.save()
@@ -478,7 +478,7 @@ class CreateFileCommentReply(APIView):
     def post(self, request, *args, **kwargs):
         content_id = self.kwargs['pk']
         comment = request.data['comment']
-        com, _ = Comments.objects.create(comment=comment, user=self.request.user)
+        com = Comments.objects.create(comment=comment, user=self.request.user)
         file = FileContent.objects.get(id=content_id)
         if file.comment is None:
             file.comment = com
@@ -496,7 +496,7 @@ class CreateCommonCommentReply(APIView):
     def post(self, request, *args, **kwargs):
         content_id = self.kwargs['pk']
         comment = request.data['comment']
-        com, _ = Comments.objects.create(comment=comment, user=self.request.user)
+        com = Comments.objects.create(comment=comment, user=self.request.user)
         common = CommonContent.objects.get(id=content_id)
         if common.comment is None:
             common.comment = com
@@ -514,7 +514,7 @@ class CreateCommonComment(APIView):
     def post(self, request, *args, **kwargs):
         content_id = self.kwargs['pk']
         comment = request.data['comment']
-        com, _ = Comments.objects.create(comment=comment, user=self.request.user)
+        com = Comments.objects.create(comment=comment, user=self.request.user)
         common = CommonContent.objects.get(id=content_id)
         common.comment.add(com)
         common.save()
