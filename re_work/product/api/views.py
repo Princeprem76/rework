@@ -44,6 +44,20 @@ class ProductList(APIView):
         return Response({"product_details": serializer.data}, status=status.HTTP_200_OK)
 
 
+class CompletedProductList(APIView):
+    serializer_class = ProductAdminDataSerializer
+    permission_classes = [IsAuthenticated, IsAdminStaff]
+
+    def get(self, request, *args, **kwargs):
+        # admin = self.request.user.is_admin
+        # admin_staff = self.request.user.is_staff_admin
+        # if not (admin or admin_staff):
+        #     return Response({'details': 'User not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
+        product = Product.objects.filter(client_id=self.kwargs["pk"], has_completed=True)
+        serializer = self.serializer_class(product, many=True)
+        return Response({"product_details": serializer.data}, status=status.HTTP_200_OK)
+
+
 class ProductComplete(APIView):
     permission_classes = [IsAuthenticated, IsAdminStaff]
 
