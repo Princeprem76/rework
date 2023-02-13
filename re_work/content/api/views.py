@@ -460,7 +460,7 @@ class CreateFileComment(APIView):
         file = FileContent.objects.get(id=content_id)
         file.comment.add(com)
         file.save()
-        sec = Section.objects.filter(video_content=content_id)
+        sec = Section.objects.filter(pre_contents__file_contents=content_id)
         sec = sec.first()
         pro = Product.objects.get(id=sec.product_id)
         users = [pro.script_writer_id, pro.client_id]
