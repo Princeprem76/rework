@@ -23,11 +23,19 @@ class ProductDataSerializer(serializers.ModelSerializer):
 class ProductAdminDataSerializer(serializers.ModelSerializer):
     # video_editor = serializers.CharField(source="video_editor.name", read_only=True, allow_null=True)
     # script_writer = serializers.CharField(source="script_writer.name", read_only=True, allow_null=True)
+    total_complete_percent = serializers.SerializerMethodField("total_complete_percents")
 
     class Meta:
         model = Product
-        fields = ['id', 'product_name', 'description', 'logo', 'video_editor', 'script_writer',
+        fields = ['id', 'product_name', 'description', 'logo', 'video_editor', 'script_writer', 'total_complete_percent'
                   ]
+
+    def total_complete_percents(self, obj):
+        obj = Section.objects.get(product_id=obj.id)
+        total_content = obj.total_contents()
+        total_complete = obj.total_complete()
+        percent = (total_complete / total_content) * 100
+        return percent
 
 
 class ProductCreateSerializer(serializers.ModelSerializer):
