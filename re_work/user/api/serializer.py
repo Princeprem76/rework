@@ -19,16 +19,19 @@ class DeveloperData(serializers.ModelSerializer):
 
 class UserSelection(serializers.ModelSerializer):
     active_product = serializers.SerializerMethodField("get_active_project")
+    completed_product = serializers.SerializerMethodField("get_completed_project")
 
     class Meta:
         model = User
-        fields = ["id", "name", 'active_product']
+        fields = ["id", "name", 'active_product', 'completed_product']
 
     def get_active_project(self, obj):
         counts = Product.objects.filter(client_id=obj.id, has_completed=False).count()
         return counts
 
-
+    def get_completed_project(self, obj):
+        counts = Product.objects.filter(client_id=obj.id, has_completed=True).count()
+        return counts
 
 
 class UserCreation(serializers.ModelSerializer):
